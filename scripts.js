@@ -18,9 +18,10 @@ var speedSlider;
 var framerateOutput;
 var newColorButton;
 var gridSizeSlider;
+var disableColorCheckbox;
 
 function setup() {
-	gridSizeSlider = createSlider(10,100,30,1);
+	gridSizeSlider = createSlider(10,100,35,1);
 	createCanvas(initialGridSize*40,initialGridSize*25);
 	frameRate(100);
 	
@@ -37,6 +38,8 @@ function setup() {
 	framerateOutput = createP("0");
 	newColorButton = createButton("new colors");
 	newColorButton.mousePressed(newColor);
+	
+	disableColorCheckbox = createCheckbox("disable color");
 }
 
 function newColor() {
@@ -51,23 +54,28 @@ function draw() {
 		for(var y = -gridSizeSlider.value(); y <= height+gridSizeSlider.value(); y+=gridSizeSlider.value()) {
 			stroke(255);
 			var angle = (noise(xoff,yoff,t)*TWO_PI);
-			var magnitude = max((noise(xoff+5,yoff+5,t)*gridSizeSlider.value()*2.5)-(gridSizeSlider.value()*0.5),0)*(magnetismSlider.value()/100);
+			var magnitude = max((noise(xoff+5,yoff+5,t)*gridSizeSlider.value()*2.5)-(gridSizeSlider.value()*0.5),0)*(magnetismSlider.value()/100)*(min(t*2000,100)/100);
 			if(magnitude > 0.1) {
-				var r = 0;
-				var g = 0;
-				var b = 0;
-				for(var i = 0; i < colors.length; i++) {
-					var colorMap = 1-(noise(xoff+(5*(i+2)),yoff+(5*(i+2)),t));
-					if(showVisualization.value() != 0) {
-						if(i+1 == showVisualization.value()) {
-							fill(colorMap*255);
-							stroke(255);
-							rect(x,y,gridSizeSlider.value(),gridSizeSlider.value());
+				var r = 255;
+				var g = 255;
+				var b = 255;
+				if(!disableColorCheckbox.checked()) {
+					var r = 0;
+					var g = 0;
+					var b = 0;
+					for(var i = 0; i < colors.length; i++) {
+						var colorMap = 1-(noise(xoff+(5*(i+2)),yoff+(5*(i+2)),t));
+						if(showVisualization.value() != 0) {
+							if(i+1 == showVisualization.value()) {
+								fill(colorMap*255);
+								stroke(255);
+								rect(x,y,gridSizeSlider.value(),gridSizeSlider.value());
+							}
 						}
+						r+=colors[i].levels[0]*colorMap;
+						g+=colors[i].levels[1]*colorMap;
+						b+=colors[i].levels[2]*colorMap;
 					}
-					r+=colors[i].levels[0]*colorMap;
-					g+=colors[i].levels[1]*colorMap;
-					b+=colors[i].levels[2]*colorMap;
 				}
 				push();
 				var v = p5.Vector.fromAngle(angle);
