@@ -3,7 +3,7 @@
 
 var points = [];
 
-var gridSize = 30;
+var initialGridSize = 30;
 
 var colors = [];
 
@@ -17,9 +17,11 @@ var showVisualization;
 var speedSlider;
 var framerateOutput;
 var newColorButton;
+var gridSizeSlider;
 
 function setup() {
-	createCanvas(gridSize*40,gridSize*25);
+	gridSizeSlider = createSlider(10,100,30,1);
+	createCanvas(initialGridSize*40,initialGridSize*25);
 	frameRate(100);
 	
 	newColor();
@@ -44,12 +46,12 @@ function newColor() {
 function draw() {
 	background(0);
 	var xoff = 0;
-	for(var x = -gridSize; x <= width+gridSize; x+=gridSize) {			
+	for(var x = -gridSizeSlider.value(); x <= width+gridSizeSlider.value(); x+=gridSizeSlider.value()) {			
 		var yoff = 0;
-		for(var y = -gridSize; y <= height+gridSize; y+=gridSize) {
+		for(var y = -gridSizeSlider.value(); y <= height+gridSizeSlider.value(); y+=gridSizeSlider.value()) {
 			stroke(255);
 			var angle = (noise(xoff,yoff,t)*TWO_PI);
-			var magnitude = max((noise(xoff+5,yoff+5,t)*gridSize*2.5)-(gridSize*0.5),0)*(magnetismSlider.value()/100);
+			var magnitude = max((noise(xoff+5,yoff+5,t)*gridSizeSlider.value()*2.5)-(gridSizeSlider.value()*0.5),0)*(magnetismSlider.value()/100);
 			if(magnitude > 0.1) {
 				var r = 0;
 				var g = 0;
@@ -60,7 +62,7 @@ function draw() {
 						if(i+1 == showVisualization.value()) {
 							fill(colorMap*255);
 							stroke(255);
-							rect(x,y,gridSize,gridSize);
+							rect(x,y,gridSizeSlider.value(),gridSizeSlider.value());
 						}
 					}
 					r+=colors[i].levels[0]*colorMap;
@@ -73,13 +75,13 @@ function draw() {
 				translate(x,y);
 			
 				rotate(v.heading());
-				var w = map(magnitude*2, 0, gridSize*1.5, 0, 4);
+				var w = map(magnitude*2, 0, gridSizeSlider.value()*1.5, 0, 4);
 				strokeWeight(w);
 				stroke(r,g,b,75);
 				line(0,0,magnitude,magnitude);
 				noStroke();
 				fill(r,g,b);
-				var r = map(magnitude*2, 0, gridSize*1.5, 0, 5);
+				var r = map(magnitude*2, 0, gridSizeSlider.value()*1.5, 0, 5);
 				ellipse(magnitude, magnitude, r);
 			
 				pop();
